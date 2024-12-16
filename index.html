@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>WebApp Sign Tax</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun&display=swap" rel="stylesheet">
+    <style>
+    
+      body {
+        font-family: 'Sarabun', sans-serif;
+        font-size: 25px;
+        padding: 20px;
+        background-color: #f9f9f9;
+         background-image: url('https://storage.googleapis.com/msgsndr/rFsiTXTiJyMWb80zk6DH/media/6278cdd4f2faaf428646d8f6.jpeg'); /* ใส่ URL ของ .gif ที่คุณต้องการใช้ */
+        background-size: cover; /* ปรับขนาดให้เต็มหน้าจอ */
+        background-position: center; /* จัดให้ภาพอยู่ตรงกลาง */
+        background-attachment: fixed; /* ทำให้ภาพคงที่ไม่เลื่อนตามการเลื่อนหน้า */
+        background-repeat: no-repeat; /* ไม่ให้ภาพซ้ำ */
+      }
+
+      .container {
+        max-width: 600px;
+        margin: auto;
+        background: rgba(255, 255, 255, 0.8); /* พื้นหลังโปร่งแสงเพื่อให้เห็นภาพพื้นหลัง */
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+          text-align: center;
+          color: #000000;
+          margin: 10px 10; /* ระยะห่างด้านบนและด้านล่าง 20px, ด้านขวาและซ้าย 0px */
+      }
+
+      label {
+        display: block;
+        margin: 5px 0 5px;
+      }
+
+      input, select, button {
+          width: 100%; /* ใช้ความกว้างเต็ม */
+          padding: 10px;
+          margin: 10px 0; /* เว้นระยะเท่ากัน */
+          border: 1px solid #ddd;
+          border-radius: 5px;
+          font-family: 'Sarabun', sans-serif;
+          font-size: 18px;
+          box-sizing: border-box; /* รวม padding และ border */
+      }
+       .flex-row {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+      .flex-row label {
+        flex: 1;
+      }
+      .flex-row input {
+        flex: 1;
+      }
+
+      button {
+        background-color: #3498db;
+        color: white;
+        cursor: pointer;
+        text-align: center; /* จัดข้อความปุ่มให้อยู่กึ่งกลาง */
+        border: none; /* เอาเส้นขอบปุ่มออก */
+        transition: background-color 0.3s; /* เพิ่มเอฟเฟกต์ตอน hover */
+        font-size: 25px;
+      }
+
+      button:hover {
+        background-color: #2980b9;
+      }
+
+      .result {
+        padding: 20px;
+        background-color: #ecf0f1;
+        border: 1px solid #bdc3c7;
+        border-radius: 5px;
+        margin-top: 20px;
+        font-size: 18px;
+      }
+
+/* ซ่อนทุกอย่างยกเว้นส่วนผลการคำนวณในโหมดการพิมพ์ */
+@media print {
+  body {
+    font-family: 'Sarabun', sans-serif; /* ฟอนต์ Sarabun */
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background: white;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  #result, #result * {
+    visibility: visible;
+  }
+
+  #result {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 90%; /* ให้มีระยะขอบด้านข้าง */
+    margin: 0 auto; /* จัดให้อยู่กึ่งกลาง */
+    padding: 20px;
+    border: 1px solid #dcdde1;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    background: white;
+  }
+
+  #result h3 {
+    font-size: 22px; /* ขนาดหัวข้อใหญ่ */
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 15px;
+  }
+
+  #result table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+
+  #result td {
+    padding: 10px;
+    border: 1px solid #dcdde1;
+    font-size: 16px;
+  }
+
+  #result td:first-child {
+    font-weight: bold;
+    background-color: #f9f9f9;
+  }
+
+  #result td:last-child {
+    text-align: right;
+  }
+
+  #result td span {
+    font-weight: bold;
+  }
+
+  #result td:last-child span {
+    color: #e74c3c; /* ใช้สีแดงเฉพาะค่าที่สำคัญ */
+  }
+
+  button {
+    display: none; /* ซ่อนปุ่มในโหมดพิมพ์ */
+  }
+}
+
+  .modal {
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        padding: 20px;
+      }
+      .modal-content {
+        background: #ffffff;
+        padding: 20px;
+        border-radius: 10px;
+        max-width: 600px;
+        margin: auto;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .modal-content h2 {
+        text-align: center;
+        color: #2c3e50;
+        margin-bottom: 10px;
+      }
+      .modal-content p {
+        line-height: 1.6;
+        margin-bottom: 20px;
+        color: #555;
+      }
+      .modal-content button {
+        display: block;
+        width: 100%;
+      }
+
+      #closeButton:hover {
+        background-color: #c0392b;
+      }
+
+/* สไตล์ของปุ่มที่มุมซ้ายบน */
+      #developerInfoButton {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        background-color: #4CAF50; /* สีพื้นหลัง */
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        border-radius: 5px;
+        width: 150px; /* ความกว้างของปุ่ม */
+        display: block; /* ให้ปุ่มแสดงเป็นบล็อก */
+        margin-bottom: 20px; /* ระยะห่างด้านล่างของปุ่ม */
+        font-family: 'Sarabun', sans-serif;  /* ฟอนต์ */
+        font-size: 20px;
+      }
+
+      /* สไตล์สำหรับข้อมูลผู้พัฒนาที่แสดงด้านล่างปุ่ม */
+      #developerInfo {
+        position: fixed;
+        top: 80px; /* ให้ข้อมูลแสดงใต้ปุ่ม */
+        left: 10px;
+        background-color: #FFFFFF; /* สีพื้นหลังของกล่องข้อมูล */
+        padding: 20px;
+        width: 320px; /* กำหนดความกว้างของกล่อง */
+        border: 1px solid #ddd; /* เส้นขอบของกล่อง */
+        border-radius: 5px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* เงาให้กล่องดูสวยงาม */
+        font-family: 'Sarabun', sans-serif;  /* ฟอนต์ */
+        display: none; /* ซ่อนข้อมูลเริ่มต้น */
+      }
+
+      /* สไตล์ของข้อความในกล่อง */
+      .info-content {
+        font-size: 16px;
+        line-height: 1.6;
+        color: #333;
+      }
+
+    </style>
+  </head>
+  <body>
+
+ <!-- ปุ่มที่มุมซ้ายบน -->
+  <button id="developerInfoButton" onclick="showDeveloperInfo()">เกี่ยวกับฉัน</button>
+  <!-- กล่องแสดงข้อมูลผู้พัฒนา -->
+    <div id="developerInfo">
+      <div class="info-content">
+        <strong>รายชื่อผู้จัดทำโครงงาน</strong> <br>
+        <strong>สมาชิกคนที่ 1 :</strong> นางสาวอณัญญา มูระคา<br>
+        <strong>สมาชิกคนที่ 2 :</strong> นางสาวปนัดดา อุ่นทวง<br>
+        <strong>สมาชิกคนที่ 3 :</strong> นางสาววนัสนันท์ สมานใจ<br>
+        <strong>สมาชิกคนที่ 4 :</strong> นางสาวภรมาภา ทองแฉล้ม<br>
+        <strong>สมาชิกคนที่ 5 :</strong> นางสาววชิราภรณ์ ทบมาตร<br>
+        <strong>สมาชิกคนที่ 6 :</strong> นายสิรภัทร ยิ้มพึ่งบุญ<br>
+        <strong>สมาชิกคนที่ 7 :</strong> นางสาวภรมาภา ทองแฉล้ม<br>
+        <strong>ระดับ :</strong> ประกาศนียบัตรวิชาชีพ (ปวช.)<br>
+        <strong>สาขาวิชา :</strong> คอมพิวเตอร์ธุรกิจ<br>
+        <strong>ห้องเรียน :</strong> BC.3/2<br>
+        <strong>อาจารย์ที่ปรึกษา :</strong> อาจารย์รพีพัทธ์ เจริญรัฐวุฒิกุล<br>
+      </div>
+    </div>
+
+   <!-- หน้าต่างแสดงข้อมูล -->
+    <div id="infoModal" class="modal">
+      <div class="modal-content">
+        <h2>ข้อมูลเบื้องต้นเกี่ยวกับภาษีป้าย</h2>
+        <p>
+          ภาษีป้ายคำนวณจากพื้นที่ของป้าย (ตร.ซม.) และประเภทของป้าย เช่น ป้ายที่มีอักษรไทยล้วน อักษรไทยผสม หรือไม่มีอักษรไทยเลย 
+          โดยมีการกำหนดอัตราภาษีตามลักษณะของป้าย.
+        </p>
+        <p>
+          ตัวอย่าง: ป้ายขนาด 500 ตร.ซม. และอัตราภาษี 20 บาทต่อหน่วย จะต้องชำระภาษี 20 บาท.
+        </p>
+        <button onclick="closeModal()">เริ่มต้นใช้งาน</button>
+      </div>
+    </div>
+
+
+<!-- ส่วนหลัก -->
+    <div class="container">
+      <h1>คำนวณภาษีป้าย (Sign Tax)</h1>
+      
+      <form id="taxForm">
+        <div class="flex-row">
+          <label>ความกว้าง (เซนติเมตร)</label>
+          <input type="number" id="width" placeholder="ป้อนความกว้างของป้าย" required>
+        </div>
+        <div class="flex-row">
+          <label>ความยาว (เซนติเมตร)</label>
+          <input type="number" id="height" placeholder="ป้อนความยาวของป้าย" required>
+        </div>
+
+        <label>ประเภทป้าย</label>
+        <select id="type">
+          <option value="1">ประเภทที่ 1 : อักษรไทยล้วน</option>
+          <option value="2">ประเภทที่ 2 : อักษรไทยปนต่างประเทศ</option>
+          <option value="3">ประเภทที่ 3 : ไม่มีอักษรไทย</option>
+        </select>
+
+        <label>ลักษณะป้าย</label>
+        <select id="subType">
+          <option value="a">ข้อความ/เครื่องหมายเคลื่อนที่</option>
+          <option value="b">ข้อความ/เครื่องหมายทั่วไป</option>
+        </select>
+
+        <label>เดือนที่ติดตั้ง</label>
+        <select id="month">
+          <option value="1">มกราคม</option>
+          <option value="2">กุมภาพันธ์</option>
+          <option value="3">มีนาคม</option>
+          <option value="4">เมษายน</option>
+          <option value="5">พฤษภาคม</option>
+          <option value="6">มิถุนายน</option>
+          <option value="7">กรกฎาคม</option>
+          <option value="8">สิงหาคม</option>
+          <option value="9">กันยายน</option>
+          <option value="10">ตุลาคม</option>
+          <option value="11">พฤศจิกายน</option>
+          <option value="12">ธันวาคม</option>
+        </select>
+
+        <button type="button" onclick="calculate()">คำนวณ</button>
+      </form>
+
+<div id="result" class="result" style="display:none;">
+  <h3 style="text-align: center; color: #2c3e50; margin-bottom: 25px;">ผลการคำนวณภาษี</h3>
+  <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+    <tbody>
+      <tr>
+        <td style="padding: 10px; border: 1px solid #ddd; background-color: #f9f9f9; width: 50%; font-weight: bold;">
+          ขนาดป้าย
+        </td>
+        <td style="padding: 10px; border: 1px solid #ddd; background-color: #ffffff; width: 50%;">
+          <span id="area"></span> ตร.ซม.
+        </td>
+      </tr>
+      <tr>
+        <td style="padding: 10px; border: 1px solid #ddd; background-color: #f9f9f9; font-weight: bold;">
+          จำนวนหน่วย 500 ตร.ซม.
+        </td>
+        <td style="padding: 10px; border: 1px solid #ddd; background-color: #ffffff;">
+          <span id="unitArea"></span> หน่วย
+        </td>
+      </tr>
+      <tr>
+        <td style="padding: 10px; border: 1px solid #ddd; background-color: #f9f9f9; font-weight: bold;">
+          อัตราภาษีต่อหน่วย
+        </td>
+        <td style="padding: 10px; border: 1px solid #ddd; background-color: #ffffff;">
+          <span id="taxRate"></span> บาท
+        </td>
+      </tr>
+      <tr>
+        <td style="padding: 10px; border: 1px solid #ddd; background-color: #f9f9f9; font-weight: bold;">
+          ภาษีทั้งหมด
+        </td>
+        <td style="padding: 10px; border: 1px solid #ddd; background-color: #ffffff; font-size: 18px; color: #e74c3c; font-weight: bold;">
+          <span id="tax"></span> บาท
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div style="text-align: center;">
+    <button onclick="window.print()" style="padding: 10px 20px; font-size: 25px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">
+      พิมพ์รายการ
+    </button>
+  </div>
+</div>
+
+
+    <script>
+
+ // ปิด Modal และแสดงเนื้อหาหลัก
+      function closeModal() {
+        document.getElementById('infoModal').style.display = 'none';
+        document.getElementById('mainContent').style.display = 'block';
+      }
+
+function calculate() {
+  const width = parseFloat(document.getElementById('width').value);
+  const height = parseFloat(document.getElementById('height').value);
+  const type = document.getElementById('type').value;
+  const subType = document.getElementById('subType').value;
+  const month = parseInt(document.getElementById('month').value);
+  google.script.run.withSuccessHandler(displayResult).calculateTax({ width, height, type, subType, month });
+}
+
+function displayResult(data) {
+  document.getElementById('result').style.display = 'block';
+  document.getElementById('area').textContent = data.area;
+  document.getElementById('unitArea').textContent = data.unitArea;
+  document.getElementById('taxRate').textContent = data.taxRate;
+  document.getElementById('tax').textContent = data.tax;
+}
+
+
+       // ฟังก์ชันที่เรียกแสดงข้อมูลผู้พัฒนา
+      function showDeveloperInfo() {
+        var infoBox = document.getElementById('developerInfo');
+        
+        // สลับการแสดง/ซ่อนข้อมูลผู้พัฒนา
+        if (infoBox.style.display === 'none' || infoBox.style.display === '') {
+          infoBox.style.display = 'block'; // แสดงข้อมูล
+        } else {
+          infoBox.style.display = 'none'; // ซ่อนข้อมูล
+        }
+      }
+    </script>
+  </body>
+</html>
